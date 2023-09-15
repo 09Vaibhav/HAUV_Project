@@ -1,0 +1,31 @@
+function [x_dot,z_dot,th_dot,xe_dot,ze_dot,the_dot,l_dot] = EquationsRhs(a,u,Tf)
+global p 
+x = a(1);        % position of uav in x dirn
+z = a(2);        % position of uav in y dirn
+th = a(3);        % course angle of uav in xy plane
+xe = a(4);       % error in position in x dirn
+ze = a(5);       % error in position in y dirn
+the = a(6);       % error in course angle 
+l = a(7);        % parameter for virtual target position
+% mu = 10*pi/180;   
+w2 = u(1);
+[kappa,dD_dl] = kapa(l,p);
+v = 0.3;
+v0 = 0.1;
+% vq = (v/(1+sqrt(xe^2+ye^2)))/dD_dl;
+% vq = (xe*v*cos(Xe)+ye*v*sin(Xe))/(xe + Xe*kappa) + v0;
+vq = (v/(1+sqrt(xe^2+ze^2)));
+g = 9.81;
+
+
+x_dot = -Tf/2*(v*cos(th));
+z_dot = -Tf/2*(v*sin(th));
+th_dot = -Tf/2*(w2);
+xe_dot = -Tf/2*(-ze*kappa*vq + v*cos(the) - vq);
+ze_dot = -Tf/2*(xe*kappa*vq - v*sin(the));
+the_dot = -Tf/2*(w2 + kappa*vq);
+l_dot = -Tf/2*(vq);
+
+end
+
+% l_d= xe.*v.*cos(Xe) + ye.*v.*sin(Xe) + (g*tan(mu)./v).*Xe - (xe.*dD_dl + k.*Xe).*vq
